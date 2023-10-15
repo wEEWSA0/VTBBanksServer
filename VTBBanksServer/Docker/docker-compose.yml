@@ -1,0 +1,36 @@
+version: '3.4'
+
+networks:
+  vtb-bank-project:
+    driver: bridge
+
+services:
+  vtb-bank-app:
+    image: docker.io/library/vtb-bank-app
+    depends_on:
+      - "vtb-bank-db"
+    container_name: vtb-bank-app
+    ports:
+      - "8088:80"
+    environment:
+      - ConnectionStrings__DefaultConnection=User ID=postgres;Password=postgres;Server=vtb-bank-db;Port=5432;Database=vtb_bank_db; IntegratedSecurity=true;Pooling=true;
+    networks:
+      - vtb-bank-project
+
+  vtb-bank-db:
+    image: postgres:latest
+    container_name: vtb-bank-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=vtb_bank_db
+    ports:
+      - "5433:5432"
+    restart: always
+    volumes:
+      - app-data:/var/lib/postgresql/data
+    networks:
+      - vtb-bank-project
+    
+volumes:
+  app-data:
